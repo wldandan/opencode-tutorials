@@ -1,13 +1,54 @@
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../stores/authStore';
 
 export default function HomePage() {
+  const { user, isAuthenticated, logout } = useAuthStore();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-indigo-600">TalkPro</h1>
-          <p className="text-gray-600 mt-1">工程师的 AI 职业教练</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-indigo-600">TalkPro</h1>
+              <p className="text-gray-600 mt-1">工程师的 AI 职业教练</p>
+            </div>
+            <div className="flex items-center gap-4">
+              {isAuthenticated ? (
+                <>
+                  <span className="text-gray-700">欢迎, {user?.name}</span>
+                  <Link
+                    to="/profile"
+                    className="text-indigo-600 hover:text-indigo-700 font-medium"
+                  >
+                    个人资料
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    退出
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-indigo-600 hover:text-indigo-700 font-medium"
+                  >
+                    登录
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    注册
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 

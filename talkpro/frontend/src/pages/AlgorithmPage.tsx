@@ -1,10 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAlgorithmStore } from '../stores/algorithmStore';
-import { startAlgorithmInterview, createAlgorithmWebSocket } from '../services/api';
+import { useAuthStore } from '../stores/authStore';
+import {
+  startAlgorithmInterview,
+  createAlgorithmWebSocket,
+  endAlgorithmInterview,
+  startAlgorithmInterviewV2,
+  createAlgorithmWebSocketV2,
+  endAlgorithmInterviewV2,
+} from '../services/api';
 
 export default function AlgorithmPage() {
   const navigate = useNavigate();
+  const { token, isAuthenticated } = useAuthStore();
   const { session, setSession, addMessage, setStreaming, setScore, clearSession } = useAlgorithmStore();
   const [input, setInput] = useState('');
   const [code, setCode] = useState('');
@@ -31,7 +40,11 @@ export default function AlgorithmPage() {
 
   const handleStart = async () => {
     try {
-      const data = await startAlgorithmInterview(difficulty);
+      // Use v2 API if authenticated, v1 otherwise
+      const data = isAuthenticated && token
+        ? await startAlgorithmInterviewV2(token, difficulty)
+        : await startAlgorithmInterview(difficulty);
+
       setSession({
         sessionId: data.sessionId,
         question: data.question,
@@ -40,8 +53,10 @@ export default function AlgorithmPage() {
         isStreaming: false,
       });
 
-      // Connect WebSocket
-      const ws = createAlgorithmWebSocket(data.sessionId);
+      // Connect WebSocket (v2 or v1 based on auth)
+      const ws = isAuthenticated && token
+        ? createAlgorithmWebSocketV2(data.sessionId, token)
+        : createAlgorithmWebSocket(data.sessionId);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -108,9 +123,10 @@ export default function AlgorithmPage() {
     if (!session?.sessionId) return;
 
     try {
-      const report = await fetch(`/api/algorithm/${session.sessionId}/end`, {
-        method: 'POST',
-      }).then((res) => res.json());
+      // Use v2 API if authenticated, v1 otherwise
+      const report = isAuthenticated && token
+        ? await endAlgorithmInterviewV2(token, session.sessionId)
+        : await endAlgorithmInterview(session.sessionId);
 
       setScore(report);
       setShowReport(true);

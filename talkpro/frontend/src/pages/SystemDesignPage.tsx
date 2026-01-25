@@ -1,10 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSystemDesignStore } from '../stores/systemDesignStore';
-import { getScenarios, startSystemDesignInterview, createSystemDesignWebSocket } from '../services/api';
+import { useAuthStore } from '../stores/authStore';
+import {
+  getScenarios,
+  startSystemDesignInterview,
+  createSystemDesignWebSocket,
+  endSystemDesignInterview,
+  startSystemDesignInterviewV2,
+  createSystemDesignWebSocketV2,
+  endSystemDesignInterviewV2,
+} from '../services/api';
 
 export default function SystemDesignPage() {
   const navigate = useNavigate();
+  const { token, isAuthenticated } = useAuthStore();
   const { session, setSession, addMessage, setStreaming, setStage, setScore, clearSession } = useSystemDesignStore();
   const [input, setInput] = useState('');
   const [scenarios, setScenarios] = useState<any[]>([]);
@@ -41,7 +51,11 @@ export default function SystemDesignPage() {
   const handleSelectScenario = async (scenarioId: string) => {
     setSelectedScenario(scenarioId);
     try {
-      const data = await startSystemDesignInterview(scenarioId);
+      // Use v2 API if authenticated, v1 otherwise
+      const data = isAuthenticated && token
+        ? await startSystemDesignInterviewV2(token, scenarioId)
+        : await startSystemDesignInterview(scenarioId);
+
       setSession({
         sessionId: data.sessionId,
         scenario: data.scenario,
@@ -51,8 +65,10 @@ export default function SystemDesignPage() {
         isStreaming: false,
       });
 
-      // Connect WebSocket
-      const ws = createSystemDesignWebSocket(data.sessionId);
+      // Connect WebSocket (v2 or v1 based on auth)
+      const ws = isAuthenticated && token
+        ? createSystemDesignWebSocketV2(data.sessionId, token)
+        : createSystemDesignWebSocket(data.sessionId);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -113,9 +129,10 @@ export default function SystemDesignPage() {
     if (!session?.sessionId) return;
 
     try {
-      const report = await fetch(`/api/system-design/${session.sessionId}/end`, {
-        method: 'POST',
-      }).then((res) => res.json());
+      // Use v2 API if authenticated, v1 otherwise
+      const report = isAuthenticated && token
+        ? await endSystemDesignInterviewV2(token, session.sessionId)
+        : await endSystemDesignInterview(session.sessionId);
 
       setScore(report);
       setShowReport(true);
