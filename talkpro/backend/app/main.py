@@ -2,11 +2,12 @@ from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import init_db
-from app.api import algorithm, system_design, websocket
+# Import v2 APIs with authentication
+from app.api import algorithm_v2 as algorithm, system_design_v2 as system_design, websocket, auth, history
 
 app = FastAPI(
     title=settings.app_name,
-    version="0.1.0",
+    version="0.2.0",
     debug=settings.debug,
 )
 
@@ -19,9 +20,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# Include routers (v2 with authentication)
 app.include_router(algorithm.router)
 app.include_router(system_design.router)
+app.include_router(auth.router)
+app.include_router(history.router)
 
 
 @app.on_event("startup")
@@ -33,7 +36,7 @@ async def startup_event():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "app": settings.app_name}
+    return {"status": "healthy", "app": settings.app_name, "version": "0.2.0"}
 
 
 @app.websocket("/ws/algorithm/{session_id}")
