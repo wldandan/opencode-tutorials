@@ -159,14 +159,99 @@ async def get_recommendations(
     limit: int = 3,
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
-    """获取个性化训练推荐"""
+    """获取个性化训练推荐（v2 - 基于简历和JD）"""
     async with async_session() as db:
+        # 获取用户数据
+        result = await db.execute(
+            select(User).where(User.id == current_user.id)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
         # 获取用户能力统计
         abilities = await get_abilities_stats(current_user)
 
         recommendations = []
 
-        # 基于薄弱点推荐
+        # 1. 基于简历推荐（如果有）
+        if user.resume_data and user.resume_data.get('skills'):
+            skills = user.resume_data['skills']
+            all_skills = (
+                skills.get('programming_languages', []) +
+                skills.get('frameworks', []) +
+                skills.get('databases', []) +
+                skills.get('tools', [])
+            )
+
+            # 识别薄弱技能（假设某些技能是热门但用户不具备）
+            popular_skills = ['Go', 'Rust', 'Kubernetes', 'Spark', 'Flink']
+            missing_popular = [s for s in popular_skills if s not in all_skills]
+
+            if missing_popular:
+                recommendations.append({
+                    "type": "algorithm",
+                    "title": f"学习{missing_popular[0]}",
+                    "reason": f"你的简历中缺少{missing_popular[0]}技能，这是当前热门技术，建议学习",
+                    "priority": 1,
+                    "scenario": "learn_popular_skill",
+                })
+
+        # 2. 基于JD推荐（如果有）
+        if user.target_jd_data:
+            jd = user.target_jd_data
+
+            # 提取JD要求的技能
+            required_skills = jd.get('skills', {}).get('required', [])
+            preferred_skills = jd.get('skills', {}).get('preferred', [])
+
+            # 提取用户简历中的技能
+            resume_skills = []
+            if user.resume_data and user.resume_data.get('skills'):
+                resume_skills = (
+                    user.resume_data['skills'].get('programming_languages', []) +
+                    user.resume_data['skills'].get('frameworks', []) +
+                    user.resume_data['skills'].get('databases', [])
+                )
+
+            # 找出差距
+            missing_skills = [s for s in required_skills if s not in resume_skills]
+            matched_skills = [s for s in required_skills if s in resume_skills]
+
+            if missing_skills:
+                # 推荐学习缺失的技能
+                skill = missing_skills[0]
+                recommendations.append({
+                    "type": "algorithm",
+                    "title": f"加强{skill}学习",
+                    "reason": f"目标岗位要求{skill}技能，但你的简历中未体现",
+                    "priority": 1,
+                    "scenario": "target_jd_gap",
+                })
+
+            # 基于JD要求推荐训练类型
+            jd_responsibilities = jd.get('responsibilities', [])
+            if any('架构' in r or '设计' in r for r in jd_responsibilities):
+                recommendations.append({
+                    "type": "system_design",
+                    "title": "系统设计训练",
+                    "reason": "目标岗位强调架构设计能力，建议加强系统设计训练",
+                    "priority": 2,
+                    "scenario": "design_weibo_feed",
+                })
+
+            # 基于JD软技能要求
+            soft_skills = jd.get('requirements', {}).get('soft_skills', [])
+            if soft_skills:
+                recommendations.append({
+                    "type": "workplace",
+                    "title": "职场场景训练",
+                    "reason": f"目标岗位强调软技能（{', '.join(soft_skills[:2])}）",
+                    "priority": 2,
+                    "scenario": "tech_proposal",
+                })
+
+        # 3. 基于历史表现推荐（原有逻辑）
         if abilities['algorithm'] < abilities['system_design']:
             recommendations.append({
                 "type": "algorithm",
