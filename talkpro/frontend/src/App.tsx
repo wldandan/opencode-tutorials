@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
 import HistoryPage from './pages/HistoryPage'
 import AbilitiesPage from './pages/AbilitiesPage'
+import GrowthPage from './pages/GrowthPage'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/abilities" element={<AbilitiesPage />} />
+        <Route path="/growth" element={<GrowthPage />} />
       </Routes>
     </BrowserRouter>
   )

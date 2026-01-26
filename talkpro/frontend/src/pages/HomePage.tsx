@@ -1,8 +1,43 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { getRecommendations } from '../services/api';
 
 export default function HomePage() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, token } = useAuthStore();
+  const navigate = useNavigate();
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [loadingRecs, setLoadingRecs] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      loadRecommendations();
+    }
+  }, [isAuthenticated, token]);
+
+  const loadRecommendations = async () => {
+    if (!token) return;
+
+    setLoadingRecs(true);
+    try {
+      const data = await getRecommendations(token, 3);
+      setRecommendations(data.recommendations || []);
+    } catch (error) {
+      console.error('Failed to load recommendations:', error);
+    } finally {
+      setLoadingRecs(false);
+    }
+  };
+
+  const handleStartTraining = (rec: any) => {
+    if (rec.type === 'algorithm') {
+      navigate(`/algorithm?difficulty=${rec.difficulty || 'medium'}`);
+    } else if (rec.type === 'system_design') {
+      navigate(`/system-design?scenario=${rec.scenario || 'design_weibo_feed'}`);
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -63,6 +98,43 @@ export default function HomePage() {
             通过 AI 模拟真实面试场景，帮助你准备算法和系统设计面试
           </p>
         </div>
+
+        {/* Recommendations Section (only for authenticated users) */}
+        {isAuthenticated && recommendations.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">为你推荐</h3>
+              <Link
+                to="/abilities"
+                className="text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                查看完整分析 →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recommendations.map((rec, index) => (
+                <div
+                  key={index}
+                  className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-md p-6 border-2 border-indigo-200"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                      {index + 1}
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-900">{rec.title}</h4>
+                  </div>
+                  <p className="text-gray-700 text-sm mb-4">{rec.reason}</p>
+                  <button
+                    onClick={() => handleStartTraining(rec)}
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    开始训练
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Training Type Selection */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -219,11 +291,48 @@ export default function HomePage() {
                   />
                 </svg>
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">随时随地</h4>
-              <p className="text-gray-600 text-sm">无需注册，立即开始练习，节省时间</p>
+              <h4 className="font-semibold text-gray-900 mb-2">智能推荐</h4>
+              <p className="text-gray-600 text-sm">基于你的表现，推荐个性化训练计划</p>
             </div>
           </div>
         </div>
+
+        {/* Authenticated User Quick Links */}
+        {isAuthenticated && (
+          <div className="mt-16 max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
+                我的成长
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Link
+                  to="/history"
+                  className="p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors text-center"
+                >
+                  <div className="text-3xl mb-2">📊</div>
+                  <div className="font-semibold text-gray-900">训练历史</div>
+                  <div className="text-sm text-gray-600">查看所有训练记录</div>
+                </Link>
+                <Link
+                  to="/abilities"
+                  className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors text-center"
+                >
+                  <div className="text-3xl mb-2">🎯</div>
+                  <div className="font-semibold text-gray-900">能力分析</div>
+                  <div className="text-sm text-gray-600">查看能力雷达图</div>
+                </Link>
+                <Link
+                  to="/growth"
+                  className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-center"
+                >
+                  <div className="text-3xl mb-2">📈</div>
+                  <div className="font-semibold text-gray-900">成长轨迹</div>
+                  <div className="text-sm text-gray-600">查看能力变化趋势</div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
