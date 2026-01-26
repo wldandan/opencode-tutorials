@@ -9,6 +9,7 @@ import enum
 class SessionType(str, enum.Enum):
     ALGORITHM = "algorithm"
     SYSTEM_DESIGN = "system_design"
+    WORKPLACE = "workplace"
 
 
 class SessionStatus(str, enum.Enum):

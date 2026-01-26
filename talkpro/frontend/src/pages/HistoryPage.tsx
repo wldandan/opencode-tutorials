@@ -8,7 +8,7 @@ export default function HistoryPage() {
   const { token, isAuthenticated } = useAuthStore();
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'algorithm' | 'system_design'>('all');
+  const [filter, setFilter] = useState<'all' | 'algorithm' | 'system_design' | 'workplace'>('all');
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [selectedSession, setSelectedSession] = useState<any>(null);
@@ -63,7 +63,12 @@ export default function HistoryPage() {
   };
 
   const getTypeLabel = (type: string) => {
-    return type === 'algorithm' ? '算法面试' : '系统设计';
+    const labels = {
+      algorithm: '算法面试',
+      system_design: '系统设计',
+      workplace: '职场场景',
+    };
+    return labels[type as keyof typeof labels] || type;
   };
 
   const getDifficultyLabel = (difficulty: string) => {
@@ -133,6 +138,16 @@ export default function HistoryPage() {
               }`}
             >
               系统设计
+            </button>
+            <button
+              onClick={() => { setFilter('workplace'); setPage(0); }}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'workplace'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              职场场景
             </button>
           </div>
 

@@ -262,3 +262,36 @@ export async function getRecommendations(token: string, limit: number = 3) {
   }
   return response.json();
 }
+
+// Workplace Interview APIs
+export async function startWorkplaceInterview(token: string, scenario: string) {
+  const response = await fetch(`${API_BASE}/workplace/v2/interview`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ scenario }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to start interview');
+  }
+  return response.json();
+}
+
+export function createWorkplaceWebSocket(sessionId: string, token: string): WebSocket {
+  return new WebSocket(`ws://localhost:8000${API_BASE}/workplace/v2/${sessionId}/ws?token=${token}`);
+}
+
+export async function endWorkplaceInterview(token: string, sessionId: string) {
+  const response = await fetch(`${API_BASE}/workplace/v2/${sessionId}/end`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to end interview');
+  }
+  return response.json();
+}

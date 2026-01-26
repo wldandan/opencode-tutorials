@@ -137,7 +137,7 @@ export default function HomePage() {
         )}
 
         {/* Training Type Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Algorithm Interview Card */}
           <Link to="/algorithm" className="group">
             <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 cursor-pointer h-full">
@@ -229,10 +229,56 @@ export default function HomePage() {
               </div>
             </div>
           </Link>
+
+          {/* Workplace Training Card */}
+          <Link to="/workplace" className="group">
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 cursor-pointer h-full">
+              <div className="flex items-center mb-4">
+                <div className="bg-green-100 p-3 rounded-full">
+                  <svg
+                    className="h-8 w-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 ml-4">
+                  职场场景
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                模拟晋升答辩、方案宣讲等真实职场场景，提升职场应对能力
+              </p>
+              <ul className="text-gray-600 space-y-2">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  晋升答辩模拟
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  方案宣讲演练
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  故障复盘训练
+                </li>
+              </ul>
+              <div className="mt-6 text-green-600 font-semibold group-hover:text-green-700">
+                开始训练 →
+              </div>
+            </div>
+          </Link>
         </div>
 
         {/* Features Section */}
-        <div className="mt-16 max-w-4xl mx-auto">
+        <div className="mt-16 max-w-6xl mx-auto">
           <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
             为什么选择 TalkPro？
           </h3>
@@ -299,7 +345,7 @@ export default function HomePage() {
 
         {/* Authenticated User Quick Links */}
         {isAuthenticated && (
-          <div className="mt-16 max-w-4xl mx-auto">
+          <div className="mt-16 max-w-6xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg p-8">
               <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
                 我的成长
