@@ -245,6 +245,12 @@ export default function ProfilePage() {
               能力分析
             </button>
             <button
+              onClick={() => navigate('/growth')}
+              className="w-full bg-green-50 text-green-600 py-3 px-4 rounded-lg font-semibold hover:bg-green-100 transition-colors"
+            >
+              成长轨迹
+            </button>
+            <button
               onClick={handleLogout}
               className="w-full bg-red-50 text-red-600 py-3 px-4 rounded-lg font-semibold hover:bg-red-100 transition-colors"
             >
