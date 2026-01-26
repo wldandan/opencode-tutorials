@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import init_db
 # Import v2 APIs with authentication
-from app.api import algorithm_v2 as algorithm, system_design_v2 as system_design, auth, history, workplace_v2
+from app.api import algorithm_v2 as algorithm, system_design_v2 as system_design, auth, history, workplace_v2, resume
 from app.api import stats
 
 app = FastAPI(
@@ -25,6 +25,7 @@ app.add_middleware(
 app.include_router(algorithm.router)
 app.include_router(system_design.router)
 app.include_router(workplace_v2.router)
+app.include_router(resume.router)
 app.include_router(auth.router)
 app.include_router(history.router)
 app.include_router(stats.router)

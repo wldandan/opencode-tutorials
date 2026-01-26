@@ -295,3 +295,58 @@ export async function endWorkplaceInterview(token: string, sessionId: string) {
   }
   return response.json();
 }
+
+// Resume APIs
+export async function uploadResume(token: string, formData: FormData) {
+  const response = await fetch(`${API_BASE}/resume/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Upload failed');
+  }
+  return response.json();
+}
+
+export async function parseResume(token: string) {
+  const response = await fetch(`${API_BASE}/resume/parse`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Parse failed');
+  }
+  return response.json();
+}
+
+export async function getResume(token: string) {
+  const response = await fetch(`${API_BASE}/resume`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch resume');
+  }
+  return response.json();
+}
+
+export async function deleteResume(token: string) {
+  const response = await fetch(`${API_BASE}/resume`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete resume');
+  }
+  return response.json();
+}

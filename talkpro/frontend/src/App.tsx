@@ -9,6 +9,7 @@ import ProfilePage from './pages/ProfilePage'
 import HistoryPage from './pages/HistoryPage'
 import AbilitiesPage from './pages/AbilitiesPage'
 import GrowthPage from './pages/GrowthPage'
+import ResumePage from './pages/ResumePage'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/abilities" element={<AbilitiesPage />} />
         <Route path="/growth" element={<GrowthPage />} />
+        <Route path="/resume" element={<ResumePage />} />
       </Routes>
     </BrowserRouter>
   )
