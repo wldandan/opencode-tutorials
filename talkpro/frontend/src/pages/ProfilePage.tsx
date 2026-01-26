@@ -230,8 +230,20 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Logout */}
-          <div className="mt-8 pt-8 border-t border-gray-200">
+          {/* Quick Links */}
+          <div className="mt-8 pt-8 border-t border-gray-200 space-y-3">
+            <button
+              onClick={() => navigate('/history')}
+              className="w-full bg-indigo-50 text-indigo-600 py-3 px-4 rounded-lg font-semibold hover:bg-indigo-100 transition-colors"
+            >
+              查看训练历史
+            </button>
+            <button
+              onClick={() => navigate('/abilities')}
+              className="w-full bg-purple-50 text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-purple-100 transition-colors"
+            >
+              能力分析
+            </button>
             <button
               onClick={handleLogout}
               className="w-full bg-red-50 text-red-600 py-3 px-4 rounded-lg font-semibold hover:bg-red-100 transition-colors"

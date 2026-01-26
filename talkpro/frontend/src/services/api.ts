@@ -225,3 +225,40 @@ export async function endSystemDesignInterviewV2(token: string, sessionId: strin
   }
   return response.json();
 }
+
+// Stats API
+export async function getAbilitiesStats(token: string) {
+  const response = await fetch(`${API_BASE}/stats/abilities`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch abilities stats');
+  }
+  return response.json();
+}
+
+export async function getGrowthStats(token: string, days: number = 30) {
+  const response = await fetch(`${API_BASE}/stats/growth?days=${days}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch growth stats');
+  }
+  return response.json();
+}
+
+export async function getRecommendations(token: string, limit: number = 3) {
+  const response = await fetch(`${API_BASE}/stats/recommendations?limit=${limit}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch recommendations');
+  }
+  return response.json();
+}
