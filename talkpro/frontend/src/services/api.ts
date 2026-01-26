@@ -350,3 +350,59 @@ export async function deleteResume(token: string) {
   }
   return response.json();
 }
+
+// JD APIs
+export async function analyzeJD(token: string, jdData: { jd_text: string; company?: string; position?: string }) {
+  const response = await fetch(`${API_BASE}/jd/analyze`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(jdData),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Analysis failed');
+  }
+  return response.json();
+}
+
+export async function getJD(token: string) {
+  const response = await fetch(`${API_BASE}/jd`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch JD');
+  }
+  return response.json();
+}
+
+export async function compareResumeJD(token: string) {
+  const response = await fetch(`${API_BASE}/jd/compare`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Comparison failed');
+  }
+  return response.json();
+}
+
+export async function deleteJD(token: string) {
+  const response = await fetch(`${API_BASE}/jd`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete JD');
+  }
+  return response.json();
+}
