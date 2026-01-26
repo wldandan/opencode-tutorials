@@ -29,13 +29,37 @@ export default function HomePage() {
     }
   };
 
+  const getRecommendationSource = (rec: any): string => {
+    // Determine if recommendation is based on resume, JD, or performance
+    if (rec.reason && rec.reason.includes('简历') && !rec.reason.includes('JD')) {
+      return '基于简历';
+    }
+    if (rec.reason && (rec.reason.includes('目标岗位') || rec.reason.includes('JD'))) {
+      return '基于JD';
+    }
+    if (rec.reason && rec.reason.includes('能力') && !rec.reason.includes('简历')) {
+      return '基于表现';
+    }
+    return '智能推荐';
+  };
+
+  const getRecommendationIcon = (rec: any): string => {
+    if (rec.type === 'algorithm') return '💻';
+    if (rec.type === 'system_design') return '🏗️';
+    if (rec.type === 'workplace') return '💼';
+    return '🎯';
+  };
+
   const handleStartTraining = (rec: any) => {
     if (rec.type === 'algorithm') {
       navigate(`/algorithm?difficulty=${rec.difficulty || 'medium'}`);
     } else if (rec.type === 'system_design') {
       navigate(`/system-design?scenario=${rec.scenario || 'design_weibo_feed'}`);
+    } else if (rec.type === 'workplace') {
+      navigate(`/workplace?scenario=${rec.scenario || 'tech_proposal'}`);
     } else {
-      navigate('/');
+      // For "any" type, navigate to profile page
+      navigate('/profile');
     }
   };
 
@@ -115,13 +139,16 @@ export default function HomePage() {
               {recommendations.map((rec, index) => (
                 <div
                   key={index}
-                  className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-md p-6 border-2 border-indigo-200"
+                  className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-md p-6 border-2 border-indigo-200 hover:shadow-lg transition-shadow"
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
-                      {index + 1}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="text-2xl">{getRecommendationIcon(rec)}</div>
+                      <h4 className="text-lg font-semibold text-gray-900">{rec.title}</h4>
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-900">{rec.title}</h4>
+                    <div className="px-2 py-1 bg-indigo-100 rounded text-xs font-medium text-indigo-700">
+                      {getRecommendationSource(rec)}
+                    </div>
                   </div>
                   <p className="text-gray-700 text-sm mb-4">{rec.reason}</p>
                   <button
