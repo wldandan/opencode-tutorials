@@ -1,1 +1,1 @@
-# opencode-tutorials
+# skill-agent-dashboard
